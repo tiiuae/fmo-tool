@@ -1,0 +1,10 @@
+# NIX os can't install those reqs by pip
+# Keep them commented for now
+# typer==0.12.3
+# colorama==0.4.4
+# shellingham==1.4.0
+# pytest==6.2.4
+# typing_extensions==4.12.2
+# pyyaml==6.0.1
+# paramiko==3.4.0
+# py3compat==0.4

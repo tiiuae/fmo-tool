@@ -1,0 +1,71 @@
+fmo-system:
+  RAversion: v0.8.4
+  alias: NA
+  defaultGW: NA
+  dockerCR: NA
+  ipaddr: NA
+name: fmo-os-rugged-tablet-7230
+release: v1.0.0a
+vms:
+  dockervm:
+    extraModules:
+      services:
+        fmo-dci:
+          backup-path: /var/lib/fogdata/docker-compose.yml.backup
+          compose-path: /var/lib/fogdata/docker-compose.yml
+          docker-url: cr.airoplatform.com
+          docker-url-path: /var/lib/fogdata/cr.url
+          enable: true
+          pat-path: /var/lib/fogdata/PAT.pat
+          preloaded-images: tii-offline-map-data-loader.tar.gz
+          update-path: /var/lib/fogdata/docker-compose.yml.new
+        fmo-dynamic-device-passthrough:
+          enable: true
+          devices:
+          - bus: usb
+            productid: '0x01a9'
+            vendorid: '0x1546'
+        monitoring-service: {}
+        portforwarding-service: {}
+    ipaddr: 192.168.101.11
+    name: dockervm
+  netvm:
+    extraModules:
+      services:
+        fmo-dci: {}
+        fmo-dynamic-device-passthrough: {}
+        monitoring-service: {}
+        portforwarding-service:
+          configuration:
+          - dip: 192.168.101.11
+            dport: '4222'
+            proto: tcp
+            sport: '4222'
+          - dip: 192.168.101.11
+            dport: '4222'
+            proto: udp
+            sport: '4222'
+          - dip: 192.168.101.11
+            dport: '7222'
+            proto: tcp
+            sport: '7222'
+          - dip: 192.168.101.11
+            dport: '7222'
+            proto: udp
+            sport: '7222'
+          - dip: 192.168.101.11
+            dport: '4223'
+            proto: tcp
+            sport: '4223'
+          - dip: 192.168.101.11
+            dport: '4223'
+            proto: udp
+            sport: '4223'
+          enable: true
+          ipaddress: 192.168.100.12
+          ipaddress-path: /etc/NetworkManager/system-connections/ip-address
+    ipaddr: 192.168.101.1
+    name: netvm
+  local:
+    name: local
+    ipaddr: 127.0.0.1
