@@ -1,5 +1,6 @@
 import os
 import yaml
+import json
 
 from typing import Dict, List
 from utils.misc import eprint
@@ -21,16 +22,18 @@ class FMOConfig_Manager(object, metaclass=Singleton):
     __valid = False
     __config_path_rw = ""
     __config_path_ro = ""
+    __ddp_path_wo = ""
 
     __DPF = "dynamic-portforwarding-service"
     __DDP = "fmo-dynamic-device-passthrough"
     __MON = "monitoring-service"
 
-    def __init__(self, config_path_ro: str, config_path_rw: str):
+    def __init__(self, config_path_ro: str, config_path_rw: str, __ddp_path_wo: str):
         self.__valid = False
         self.__schema = None
         self.__config_path_rw = config_path_rw
         self.__config_path_ro = config_path_ro
+        self.__ddp_path_wo = __ddp_path_wo
 
         try:
             with open(config_path_rw) as yaml_conifg:
@@ -69,6 +72,8 @@ class FMOConfig_Manager(object, metaclass=Singleton):
         os.makedirs(os.path.dirname(self.__config_path_rw), exist_ok=True)
         with open(self.__config_path_rw, "w") as yaml_config:
             yaml.dump(config, yaml_config)
+        # Whenever fmo-config changed, rewrite ddp config
+        self.write_vmddp_config()
 
     def restore_config(self) -> None:
         import shutil
@@ -156,6 +161,25 @@ class FMOConfig_Manager(object, metaclass=Singleton):
         for k in newconf.keys():
             config[k] = newconf[k]
 
+    def write_vmddp_config(self) -> None:
+        vmlist = self.get_vms_names_list()
+        vmddplist = []
+        for vmname in vmlist:
+            dpconfig = self._get_vmddp_config(vmname).get_config()
+            try:
+                if (dpconfig.get("enable",False)):
+                    devicelist = dpconfig.get("devices", [])
+                    for device in devicelist:
+                        device["vendorId"]=device.pop("vendorid")
+                        device["productId"]=device.pop("productid")
+                    vmddplist.append({'name': vmname, 'qmpSocket': '/var/lib/microvms/'+vmname+'/'+vmname+'.sock', 'usbPassthrough': devicelist})
+            except Exception as e:
+                continue
+        vhotplugconf = {"vms": vmddplist }
+        os.makedirs(os.path.dirname(self.__ddp_path_wo), exist_ok=True)
+        with open(self.__ddp_path_wo, "w") as ddp_config:
+            json.dump(vhotplugconf, ddp_config)
+
 # ############################
 # # Internal usage functions #
 # ############################
@@ -187,7 +211,8 @@ class FMOConfig_Manager(object, metaclass=Singleton):
 
 def get_fmoconfig_manager() -> FMOConfig_Manager:
     manager = FMOConfig_Manager("/etc/fmo-config.yaml",
-                                "/var/host/fmo-config.yaml")
+                                "/var/host/fmo-config.yaml",
+                                "/var/host/vmddp.conf")
     if not manager.is_valid():
         eprint("Config is not valid")
         raise Exception("Config is not valid")

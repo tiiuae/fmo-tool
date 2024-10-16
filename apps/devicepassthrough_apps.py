@@ -1,15 +1,18 @@
 import typer
+import os
 
 from enum import Enum
 from utils.ssh import ssh_vm_helper
 from utils.misc import print_config, eprint
 from utils.utils import get_ctx_if_vm_exist
+from utils.fmoconfig import get_fmoconfig_manager
 
 from typing_extensions import Annotated
 
 
 app = typer.Typer()
 
+SEVICE_NAME = "fmo-dynamic-device-passthrough-service"
 
 class DP_Proto(str, Enum):
     usb = "usb"
@@ -32,6 +35,14 @@ def get_dp_config(
 
     print(print_config(pfconfig))
 
+@app.command("generate")
+def generate_dp_config(
+) -> None:
+    """
+    Generate VM DDP config
+    """
+    ctx = get_fmoconfig_manager()
+    ctx.write_vmddp_config()
 
 @app.command("add")
 def add_dp_rules(
@@ -47,6 +58,7 @@ def add_dp_rules(
     ctx = get_ctx_if_vm_exist(vmname)
     dpconfig = ctx.get_vmddp_config(vmname)
     configuration = dpconfig.get("devices", [])
+    enabled = dpconfig.get("enable", None)
 
     if bus == 'pcie':
         eprint("PCIe dynamic device passthroug not implemented yet")
@@ -62,8 +74,16 @@ def add_dp_rules(
                'productid': productid, 'vendorid': vendorid}
     configuration.append(newrule)
     dpconfig['devices'] = configuration
+    # If "enable" key not found, set default false
+    if enabled == None:
+        dpconfig['enable'] = False
+        eprint('Set enable status using: sudo fmo-tool ddp enabled ' +vmname+ ' --enable')
+    # If "enable" key is False, print guideline to enable
+    if enabled == False:
+        eprint('Set enable status using: sudo fmo-tool ddp enabled ' +vmname+ ' --enable')
     ctx.set_vmddp_config(vmname, dpconfig)
     ctx.save_config()
+    os.system(f"sudo systemctl restart {SEVICE_NAME}.service")
     raise typer.Exit(code=0)
 
 
@@ -88,6 +108,9 @@ def delete_dp_rules(
     eprint(f"Delete rule: {_}")
     ctx.set_vmddp_config(vmname, dpconfig)
     ctx.save_config()
+    os.system(f"sudo systemctl restart {SEVICE_NAME}.service")
+    # TODO: Can this be done automatically? Instead of asking user to physically unplug device
+    eprint('Please unplug the device for rules to take effect!')
     raise typer.Exit(code=0)
 
 
@@ -141,4 +164,5 @@ def ddp_service_enabled_cmd(
         ctx.set_vmddp_enabled(vmname, enable)
         ctx.save_config()
 
+    os.system(f"sudo systemctl restart {SEVICE_NAME}.service")
     print(ctx.get_vmddp_enabled(vmname))
