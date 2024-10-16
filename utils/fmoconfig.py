@@ -75,6 +75,29 @@ class FMOConfig_Manager(object, metaclass=Singleton):
         # Whenever fmo-config changed, rewrite ddp config
         self.write_vmddp_config()
 
+    def write_vmpf_config(self, vmname: str, pfconfig: List[Dict]) -> None:
+        # TODO: this one need to be read from fmo-config.yaml
+        vms_pf_configs = {
+            'netvm': '/var/netvm/netconf/dpf.config',
+        }
+        if vmname not in vms_pf_configs:
+            eprint(f"no valid dpf.config paths for {vmname}")
+            return
+
+        rules = []
+        for n, config in enumerate(pfconfig):
+            sip = config.get("sip", self.get_system_ip())
+            dip = config.get("dip")
+            sport = config.get("sport")
+            dport = config.get("dport")
+            proto = config.get("proto")
+            rules.append(f"{sip} {sport} {dport} {dip} {proto}")
+
+        with open(vms_pf_configs[vmname], "w") as f:
+            f.write("\n".join(rules))
+            f.flush()
+            os.fsync(f)
+
     def restore_config(self) -> None:
         import shutil
         shutil.copy(self.__config_path_ro, self.__config_path_rw)
