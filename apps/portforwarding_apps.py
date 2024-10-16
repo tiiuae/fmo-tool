@@ -8,7 +8,7 @@ from utils.utils import get_ctx_if_vm_exist, get_ctx_if_dpf_enabled
 from typing_extensions import Annotated
 
 
-SEVICE_NAME = "fmo-dpf"
+SEVICE_NAME = "fmo-dynamic-portforwarding-service"
 
 
 class PF_Proto(str, Enum):
@@ -68,6 +68,7 @@ def add_pf_rules(
     pfconfig['configuration'] = configuration
     ctx.set_vmportforwarding(vmname, pfconfig)
     ctx.save_config()
+    ctx.write_vmpf_config(vmname, configuration)
     raise typer.Exit(code=0)
 
 
@@ -92,6 +93,7 @@ def delete_pf_rules(
     eprint(f"Delete rule: {_}")
     ctx.set_vmportforwarding(vmname, pfconfig)
     ctx.save_config()
+    ctx.write_vmpf_config(vmname, configuration)
     raise typer.Exit(code=0)
 
 
