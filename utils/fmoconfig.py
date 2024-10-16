@@ -85,7 +85,7 @@ class FMOConfig_Manager(object, metaclass=Singleton):
             return
 
         rules = []
-        for n, config in enumerate(configuration):
+        for n, config in enumerate(pfconfig):
             sip = config.get("sip", self.get_system_ip())
             dip = config.get("dip")
             sport = config.get("sport")
