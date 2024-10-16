@@ -68,7 +68,7 @@ def add_pf_rules(
     pfconfig['configuration'] = configuration
     ctx.set_vmportforwarding(vmname, pfconfig)
     ctx.save_config()
-    ctx.write_vmpf_config(vmname, pfconfig)
+    ctx.write_vmpf_config(vmname, configuration)
     raise typer.Exit(code=0)
 
 
@@ -93,7 +93,7 @@ def delete_pf_rules(
     eprint(f"Delete rule: {_}")
     ctx.set_vmportforwarding(vmname, pfconfig)
     ctx.save_config()
-    ctx.write_vmpf_config(vmname, pfconfig)
+    ctx.write_vmpf_config(vmname, configuration)
     raise typer.Exit(code=0)
 
 

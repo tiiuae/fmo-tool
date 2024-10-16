@@ -75,7 +75,7 @@ class FMOConfig_Manager(object, metaclass=Singleton):
         # Whenever fmo-config changed, rewrite ddp config
         self.write_vmddp_config()
 
-    def write_vmpf_config(self, vmname: str, pfconfig: List[str]) -> None:
+    def write_vmpf_config(self, vmname: str, pfconfig: List[Dict]) -> None:
         # TODO: this one need to be read from fmo-config.yaml
         vms_pf_configs = {
             'netvm': '/var/netvm/netconf/dpf.conifg',
