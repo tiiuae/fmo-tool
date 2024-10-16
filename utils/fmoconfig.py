@@ -78,7 +78,7 @@ class FMOConfig_Manager(object, metaclass=Singleton):
     def write_vmpf_config(self, vmname: str, pfconfig: List[Dict]) -> None:
         # TODO: this one need to be read from fmo-config.yaml
         vms_pf_configs = {
-            'netvm': '/var/netvm/netconf/dpf.conifg',
+            'netvm': '/var/netvm/netconf/dpf.config',
         }
         if vmname not in vms_pf_configs:
             eprint(f"no valid dpf.config paths for {vmname}")
@@ -93,7 +93,7 @@ class FMOConfig_Manager(object, metaclass=Singleton):
             proto = config.get("proto")
             rules.append(f"{sip} {sport} {dport} {dip} {proto}")
 
-        with open(vms_pf_configs[vmname]) as f:
+        with open(vms_pf_configs[vmname], "w") as f:
             f.write_lines(rules)
 
     def restore_config(self) -> None:
