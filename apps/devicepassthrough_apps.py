@@ -12,7 +12,7 @@ from typing_extensions import Annotated
 
 app = typer.Typer()
 
-SEVICE_NAME = "fmo-dynamic-device-passthrough-service"
+SEVICE_NAME = "fmo-dpf"
 
 class DP_Proto(str, Enum):
     usb = "usb"

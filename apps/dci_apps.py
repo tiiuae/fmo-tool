@@ -5,7 +5,7 @@ from utils.utils import get_ctx_if_vm_exist, get_ctx_if_dci_enabled
 
 from typing_extensions import Annotated
 
-SERVICE_NAME = "fmo-dynamic-portforwarding-service"
+SERVICE_NAME = "fmo-dci"
 
 app = typer.Typer()
 
@@ -18,7 +18,7 @@ def docker_service_restart_cmd(
     Request DCI restart
     """
     _ = get_ctx_if_dci_enabled(vmname)
-    ssh_vm_helper(vmname, f"systemctl restart {SERVICE_NAME}.service")
+    ssh_vm_helper(vmname, f"sudo -S systemctl restart {SERVICE_NAME}.service")
 
 
 @app.command("start")
@@ -29,7 +29,7 @@ def docker_service_start_cmd(
     Request DCI start
     """
     _ = get_ctx_if_dci_enabled(vmname)
-    ssh_vm_helper(vmname, f"systemctl start {SERVICE_NAME}.service")
+    ssh_vm_helper(vmname, f"sudo -S systemctl start {SERVICE_NAME}.service")
 
 
 @app.command("stop")
@@ -40,7 +40,7 @@ def docker_service_stop_cmd(
     Request DCI stop
     """
     _ = get_ctx_if_dci_enabled(vmname)
-    ssh_vm_helper(vmname, f"systemctl stop {SERVICE_NAME}.service")
+    ssh_vm_helper(vmname, f"sudo -S systemctl stop {SERVICE_NAME}.service")
 
 
 @app.command("status")

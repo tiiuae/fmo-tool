@@ -8,7 +8,7 @@ from utils.utils import get_ctx_if_vm_exist, get_ctx_if_dpf_enabled
 from typing_extensions import Annotated
 
 
-SEVICE_NAME = "fmo-dpf"
+SEVICE_NAME = "fmo-dynamic-device-passthrough-service"
 
 
 class PF_Proto(str, Enum):
@@ -153,7 +153,7 @@ def dpf_service_restart_cmd(
     Request DPF restart
     """
     _ = get_ctx_if_dpf_enabled(vmname)
-    ssh_vm_helper(vmname, f"systemctl restart {SEVICE_NAME}.service")
+    ssh_vm_helper(vmname, f"sudo -S systemctl restart {SEVICE_NAME}.service")
 
 
 @app.command("start")
@@ -164,7 +164,7 @@ def dpf_service_start_cmd(
     Request DPF start
     """
     _ = get_ctx_if_dpf_enabled(vmname)
-    ssh_vm_helper(vmname, f"systemctl start {SEVICE_NAME}.service")
+    ssh_vm_helper(vmname, f"sudo -S systemctl start {SEVICE_NAME}.service")
 
 
 @app.command("stop")
@@ -175,7 +175,7 @@ def dpf_service_stop_cmd(
     Request DPF stop
     """
     _ = get_ctx_if_dpf_enabled(vmname)
-    ssh_vm_helper(vmname, f"systemctl stop {SEVICE_NAME}.service")
+    ssh_vm_helper(vmname, f"sudo -S systemctl stop {SEVICE_NAME}.service")
 
 
 @app.command("status")

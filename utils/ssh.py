@@ -32,12 +32,9 @@ def ssh_vm_helper(vmname: str, cmd: Optional[str]=None) -> None:
         'netvm': '-i /run/ssh-keys/id_ed25519 -o StrictHostKeyChecking=no',
         'dockervm': '-i /run/ssh-keys/id_ed25519 -o StrictHostKeyChecking=no'
     }
-    if vmname not in ssh_configs:
-        eprint(f"no valid ssh.config paths for {vmname}")
-        return
 
     ip = ctx.get_vm_ip(vmname)
-    ssh(ip, cmd=cmd)
+    ssh(ip, cmd=cmd, args=ssh_configs.get(vmname, ""))
 
 
 def ssh(ip: str, port: int=22, cmd: Optional[str]=None, system: bool=True, args: Optional[str]=None) -> None:
@@ -49,12 +46,16 @@ def ssh(ip: str, port: int=22, cmd: Optional[str]=None, system: bool=True, args:
 
 def ssh_system(ip: str, port: int=22, cmd: Optional[str]=None, args: Optional[str]=None) -> None:
     import os
+    args = args if args is not None else ""
+
     if not cmd:
         # TODO: need to get the name from config?
-        os.system(f"ssh -p {port} ghaf@{ip} " + args if args is not None else "")
+        cmd = f"ssh -p {port} {args} ghaf@{ip}"
     else:
         # TODO: need to get the name from config?
-        os.system(f"ssh -p {port} ghaf@{ip} {cmd} "  + args if args is not None else "")
+        cmd = f"ssh -p {port} {args} ghaf@{ip} {cmd}"
+
+    os.system(cmd)
 
 
 def ssh_paramiko(ip: str, port: int=22, cmd: Optional[str]=None) -> None:
