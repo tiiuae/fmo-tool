@@ -117,7 +117,7 @@ def get_pf_rules(
 
     if hreadable:
         for n, config in enumerate(configuration):
-            sip = config.get("sip", ctx.get_system_ip())
+            sip = config.get("sip", "NA")
             dip = config.get("dip")
             sport = config.get("sport")
             dport = config.get("dport")
@@ -130,7 +130,7 @@ def get_pf_rules(
 
     if rules:
         for n, config in enumerate(configuration):
-            sip = config.get("sip", ctx.get_system_ip())
+            sip = config.get("sip", "NA")
             dip = config.get("dip")
             sport = config.get("sport")
             dport = config.get("dport")
@@ -140,7 +140,7 @@ def get_pf_rules(
 
     for n, config in enumerate(configuration):
         if config.get("sip") is None:
-            config["sip"] = pfconfig["ipaddress"]
+            config["sip"] = "NA"
         print(n, config)
     raise typer.Exit(code=0)
 
