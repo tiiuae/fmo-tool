@@ -86,7 +86,7 @@ class FMOConfig_Manager(object, metaclass=Singleton):
 
         rules = []
         for n, config in enumerate(pfconfig):
-            sip = config.get("sip", self.get_system_ip())
+            sip = config.get("sip", "NA")
             dip = config.get("dip")
             sport = config.get("sport")
             dport = config.get("dport")
@@ -103,6 +103,10 @@ class FMOConfig_Manager(object, metaclass=Singleton):
         shutil.copy(self.__config_path_ro, self.__config_path_rw)
 
     def get_system_ip(self) -> str:
+        #TODO: system ip needs to be managment by fmo-config
+        with open("/var/fogdata/ip-address") as f:
+            return f.readline().strip()
+
         return self._get_system_config().get("ipaddr", "")
 
     def set_system_ip(self, ip: str) -> str:

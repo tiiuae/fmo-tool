@@ -1,6 +1,6 @@
 import typer
 
-from utils.misc import print_config
+from utils.misc import print_config, eprint
 from utils.fmoconfig import get_fmoconfig_manager
 from typing_extensions import Annotated
 
@@ -26,6 +26,9 @@ def ip(ip: Annotated[str, typer.Argument(help="New IP")] = None):
     if ip is None:
         print(ctx.get_system_ip())
     else:
+        #TODO: system IP needs to be managment by fmo-tool
+        eprint("Storing the system's IP has not been implemented yet")
+        return
         ctx.set_system_ip(ip)
         ctx.save_config()
 
