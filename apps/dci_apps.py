@@ -5,7 +5,7 @@ from utils.utils import get_ctx_if_vm_exist, get_ctx_if_dci_enabled
 
 from typing_extensions import Annotated
 
-SERVICE_NAME = "fmo-dci"
+SERVICE_NAME = "fmo-dynamic-portforwarding-service"
 
 app = typer.Typer()
 

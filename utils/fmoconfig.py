@@ -95,6 +95,8 @@ class FMOConfig_Manager(object, metaclass=Singleton):
 
         with open(vms_pf_configs[vmname], "w") as f:
             f.write("\n".join(rules))
+            f.flush()
+            os.fsync(f)
 
     def restore_config(self) -> None:
         import shutil
