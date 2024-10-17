@@ -94,7 +94,7 @@ class FMOConfig_Manager(object, metaclass=Singleton):
             rules.append(f"{sip} {sport} {dport} {dip} {proto}")
 
         with open(vms_pf_configs[vmname], "w") as f:
-            f.writelines(rules)
+            f.write("\n".join(rules))
 
     def restore_config(self) -> None:
         import shutil
