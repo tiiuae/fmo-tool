@@ -105,7 +105,7 @@ class FMOConfig_Manager(object, metaclass=Singleton):
     def get_system_ip(self) -> str:
         #TODO: system ip needs to be managment by fmo-config
         with open("/var/fogdata/ip-address") as f:
-            return f.readline()
+            return f.readline().strip()
 
         return self._get_system_config().get("ipaddr", "")
 
