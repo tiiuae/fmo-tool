@@ -8,7 +8,7 @@ from utils.utils import get_ctx_if_vm_exist, get_ctx_if_dpf_enabled
 from typing_extensions import Annotated
 
 
-SEVICE_NAME = "fmo-dynamic-device-passthrough-service"
+SEVICE_NAME = "fmo-dynamic-portforwarding-service"
 
 
 class PF_Proto(str, Enum):
