@@ -26,8 +26,8 @@ def ip(ip: Annotated[str, typer.Argument(help="New IP")] = None):
     if ip is None:
         print(ctx.get_system_ip())
     else:
-        #TODO: system IP need to be managment by fmo-tool
-        eprint("Storing system IP is not implemented yet")
+        #TODO: system IP needs to be managment by fmo-tool
+        eprint("Storing the system's IP has not been implemented yet")
         return
         ctx.set_system_ip(ip)
         ctx.save_config()
