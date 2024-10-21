@@ -1,26 +1,19 @@
 import typer
+import getpass
 
 from typing import Optional
 from typing_extensions import Annotated
+from utils.misc import require_root
 from utils.utils import get_ctx_if_vm_exist
 
+def ssh_vm_helper_with_sudo(vmname: str, cmd: Optional[str]=None, prompt: str="Type remote sudo password: ") -> None:
+    password = getpass.getpass(prompt)
+    if not password:
+        eprint("No password entered!")
+    new_cmd = f"'echo {password} | sudo -S {cmd}'"
+    ssh_vm_helper(vmname, new_cmd)
 
-app = typer.Typer()
-
-
-@app.command("ssh")
-def ssh_cmd(
-    vmname: Annotated[str, typer.Argument(help="VM name to ssh")],
-    cmd: Annotated[str, typer.Argument(
-        help="command to run remotly, "
-             "commands with params need to be quoted: `ls -l`")],
-) -> None:
-    """
-    SSH to vm
-    """
-    ssh_vm_helper(vmname, cmd)
-
-
+@require_root
 def ssh_vm_helper(vmname: str, cmd: Optional[str]=None) -> None:
     """
     SSH to vm

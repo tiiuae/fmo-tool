@@ -3,7 +3,7 @@ import yaml
 import json
 
 from typing import Dict, List
-from utils.misc import eprint
+from utils.misc import eprint, require_root
 from utils.fmoconfig_schema import FMO_Schema
 
 
@@ -67,6 +67,7 @@ class FMOConfig_Manager(object, metaclass=Singleton):
     def get_config(self) -> Dict:
         return self.__schema.get_config()
 
+    @require_root
     def save_config(self) -> None:
         config = self.__schema.get_config()
         os.makedirs(os.path.dirname(self.__config_path_rw), exist_ok=True)
@@ -75,6 +76,7 @@ class FMOConfig_Manager(object, metaclass=Singleton):
         # Whenever fmo-config changed, rewrite ddp config
         self.write_vmddp_config()
 
+    @require_root
     def write_vmpf_config(self, vmname: str, pfconfig: List[Dict]) -> None:
         # TODO: this one need to be read from fmo-config.yaml
         vms_pf_configs = {
@@ -98,6 +100,7 @@ class FMOConfig_Manager(object, metaclass=Singleton):
             f.flush()
             os.fsync(f)
 
+    @require_root
     def restore_config(self) -> None:
         import shutil
         shutil.copy(self.__config_path_ro, self.__config_path_rw)
@@ -188,6 +191,7 @@ class FMOConfig_Manager(object, metaclass=Singleton):
         for k in newconf.keys():
             config[k] = newconf[k]
 
+    @require_root
     def write_vmddp_config(self) -> None:
         vmlist = self.get_vms_names_list()
         vmddplist = []
