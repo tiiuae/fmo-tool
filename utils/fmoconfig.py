@@ -22,18 +22,16 @@ class FMOConfig_Manager(object, metaclass=Singleton):
     __valid = False
     __config_path_rw = ""
     __config_path_ro = ""
-    __ddp_path_wo = ""
 
     __DPF = "dynamic-portforwarding-service"
     __DDP = "fmo-dynamic-device-passthrough"
     __MON = "monitoring-service"
 
-    def __init__(self, config_path_ro: str, config_path_rw: str, __ddp_path_wo: str):
+    def __init__(self, config_path_ro: str, config_path_rw: str):
         self.__valid = False
         self.__schema = None
         self.__config_path_rw = config_path_rw
         self.__config_path_ro = config_path_ro
-        self.__ddp_path_wo = __ddp_path_wo
 
         try:
             with open(config_path_rw) as yaml_conifg:
@@ -73,8 +71,6 @@ class FMOConfig_Manager(object, metaclass=Singleton):
         os.makedirs(os.path.dirname(self.__config_path_rw), exist_ok=True)
         with open(self.__config_path_rw, "w") as yaml_config:
             yaml.dump(config, yaml_config)
-        # Whenever fmo-config changed, rewrite ddp config
-        self.write_vmddp_config()
 
     @require_root
     def write_vmpf_config(self, vmname: str, pfconfig: List[Dict]) -> None:
@@ -193,6 +189,8 @@ class FMOConfig_Manager(object, metaclass=Singleton):
 
     @require_root
     def write_vmddp_config(self) -> None:
+        # TODO: this one need to be read from fmo-config.yaml
+        ddp_path_wo = "/var/host/vmddp.conf"
         vmlist = self.get_vms_names_list()
         vmddplist = []
         for vmname in vmlist:
@@ -207,8 +205,8 @@ class FMOConfig_Manager(object, metaclass=Singleton):
             except Exception as e:
                 continue
         vhotplugconf = {"vms": vmddplist }
-        os.makedirs(os.path.dirname(self.__ddp_path_wo), exist_ok=True)
-        with open(self.__ddp_path_wo, "w") as ddp_config:
+        os.makedirs(os.path.dirname(ddp_path_wo), exist_ok=True)
+        with open(ddp_path_wo, "w") as ddp_config:
             json.dump(vhotplugconf, ddp_config)
 
 # ############################
@@ -242,8 +240,7 @@ class FMOConfig_Manager(object, metaclass=Singleton):
 
 def get_fmoconfig_manager() -> FMOConfig_Manager:
     manager = FMOConfig_Manager("/etc/fmo-config.yaml",
-                                "/var/host/fmo-config.yaml",
-                                "/var/host/vmddp.conf")
+                                "/var/host/fmo-config.yaml")
     if not manager.is_valid():
         eprint("Config is not valid")
         raise Exception("Config is not valid")
