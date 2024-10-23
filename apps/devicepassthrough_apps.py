@@ -83,6 +83,7 @@ def add_dp_rules(
         eprint('Set enable status using: sudo fmo-tool ddp enabled ' +vmname+ ' --enable')
     ctx.set_vmddp_config(vmname, dpconfig)
     ctx.save_config()
+    ctx.write_vmddp_config()
     os.system(f"sudo systemctl restart {SEVICE_NAME}.service")
     raise typer.Exit(code=0)
 
@@ -108,6 +109,7 @@ def delete_dp_rules(
     eprint(f"Delete rule: {_}")
     ctx.set_vmddp_config(vmname, dpconfig)
     ctx.save_config()
+    ctx.write_vmddp_config()
     os.system(f"sudo systemctl restart {SEVICE_NAME}.service")
     # TODO: Can this be done automatically? Instead of asking user to physically unplug device
     eprint('Please unplug the device for rules to take effect!')
@@ -163,6 +165,7 @@ def ddp_service_enabled_cmd(
     if enable or disable:
         ctx.set_vmddp_enabled(vmname, enable)
         ctx.save_config()
+        ctx.write_vmddp_config()
 
     os.system(f"sudo systemctl restart {SEVICE_NAME}.service")
     print(ctx.get_vmddp_enabled(vmname))
