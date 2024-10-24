@@ -125,7 +125,7 @@ def get_pf_rules(
             print(
                 f"iptables -I INPUT -p {proto} --dport {sport} -j ACCEPT")
             print(f"iptables -t nat -I PREROUTING -p {proto} -d {dip} "
-                  f"--dport {sport} -j DNAT --to-detination {sip}:{dport}")
+                  f"--dport {sport} -j DNAT --to-destination {sip}:{dport}")
         raise typer.Exit(code=0)
 
     if rules:
