@@ -199,8 +199,11 @@ class FMOConfig_Manager(object, metaclass=Singleton):
                 if (dpconfig.get("enable",False)):
                     devicelist = dpconfig.get("devices", [])
                     for device in devicelist:
-                        device["vendorId"]=device.pop("vendorid")
-                        device["productId"]=device.pop("productid")
+                        if "vendorid" in device and "productid" in device:
+                            device["vendorId"]=device.pop("vendorid")
+                            device["productId"]=device.pop("productid")
+                        elif "vendorname" in device:
+                            device["vendorName"]=device.pop("vendorname")                            
                     vmddplist.append({'name': vmname, 'qmpSocket': '/var/lib/microvms/'+vmname+'/'+vmname+'.sock', 'usbPassthrough': devicelist})
             except Exception as e:
                 continue

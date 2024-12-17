@@ -48,8 +48,9 @@ def generate_dp_config(
 def add_dp_rules(
     vmname: Annotated[str, typer.Argument(help="VM name to print rules")],
 
-    productid: Annotated[str, typer.Option("--productid", "-p")],
-    vendorid: Annotated[str, typer.Option("--vendorid", "-v")],
+    productid: Annotated[str, typer.Option("--productid", "-p")]=None,
+    vendorid: Annotated[str, typer.Option("--vendorid", "-v")]=None,
+    vendorname: Annotated[str, typer.Option("--vendorname", "-vn")]=None,
     bus: Annotated[DP_Proto, typer.Option("--bus", "-b")] = "usb",
 ) -> None:
     """
@@ -59,6 +60,10 @@ def add_dp_rules(
     dpconfig = ctx.get_vmddp_config(vmname)
     configuration = dpconfig.get("devices", [])
     enabled = dpconfig.get("enable", None)
+
+    if vendorname is None and (productid is None or vendorid is None):
+        eprint("Missing option: Either VendorName is provided or both VendorID and ProductID are provided")
+        raise typer.Exit(code=-1)
 
     if bus == 'pcie':
         eprint("PCIe dynamic device passthroug not implemented yet")
@@ -70,12 +75,18 @@ def add_dp_rules(
         raise typer.Exit(code=-1)
 
     eprint("Add a new rule")
-    newrule = {'bus': "usb" if bus == "usb" else "pcie",
+    if vendorname is None:
+        newrule = {'bus': "usb" if bus == "usb" else "pcie",
                'productid': productid, 'vendorid': vendorid}
-    configuration.append(newrule)
+        configuration.append(newrule)
+    else:
+        newrule = {'bus': "usb" if bus == "usb" else "pcie",
+               'vendorname': vendorname}
+        configuration.append(newrule)
+        
     dpconfig['devices'] = configuration
     # If "enable" key not found, set default false
-    if enabled == None:
+    if enabled is None:
         dpconfig['enable'] = False
         eprint('Set enable status using: sudo fmo-tool ddp enabled ' +vmname+ ' --enable')
     # If "enable" key is False, print guideline to enable
@@ -136,9 +147,13 @@ def get_dp_rules(
     if rules:
         for n, config in enumerate(configuration):
             bus = config['bus']
-            pid = config['productid']
-            vid = config['vendorid']
-            print(f"{bus} {pid} {vid}")
+            vendorname = config.get("vendorname", None)
+            if vendorname is None:
+                pid = config['productid']
+                vid = config['vendorid']
+                print(f"{bus} {pid} {vid}")
+            else:
+                print(f"{bus} {vendorname}")
         raise typer.Exit(code=0)
 
     for n, config in enumerate(configuration):
