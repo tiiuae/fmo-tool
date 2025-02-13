@@ -77,7 +77,7 @@ hyperDCIService = {
     'pat-path': "",
     'preloaded-images': "",
     'update-path': "",
-    'docker-mtu': "",
+    'docker-mtu': 1500,
 }
 
 hyperConfigServices = {
